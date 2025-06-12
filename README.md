@@ -133,7 +133,6 @@ The AdminUserInitializer component adds a default admin user at application star
 
 - `login.html`: Custom login form
 - `dashboard.html`: Simple dashboard page shown post-login
-- 
 > All templates are located in `src/main/resources/templates`.
 ---
 
