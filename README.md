@@ -58,9 +58,9 @@ The application uses **Spring Security's filter chain** with the following flow:
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/security_demo
-spring.datasource.username=postgres
-spring.datasource.password=12345
-spring.jpa.hibernate.ddl-auto=update
+spring.datasource.username=USERNAME
+spring.datasource.password=PASSWORD
+spring.jpa.hibernate.ddl-auto=create-drop
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
