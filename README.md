@@ -85,6 +85,59 @@ public class CustomUserDetailsService implements UserDetailsService {
 }
 ```
 ---
+## 🔐 JWT Authentication (Updated Security Flow)
+
+The application now supports **JWT-based authentication** in addition to the initial basic login setup. This enables stateless, token-based security for APIs.
+
+---
+
+### 📝 Implementation Summary
+
+1. **AuthRequest DTO**
+    - A simple POJO created to receive login credentials:
+      ```java
+      @Data
+      @NoArgsConstructor
+      @AllArgsConstructor
+      public class AuthRequest {
+          private String username;
+          private String password;
+      }
+      ```
+
+2. **AuthController Updates**
+    - Switched from `@Controller` to `@RestController` for REST APIs.
+    - Added a new endpoint:
+      ```java
+      @PostMapping("/authenticate")
+      public String generateToken(@RequestBody AuthRequest authRequest) {
+          try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+            );
+            return jwtUtil.generateToken(authRequest.getUsername());
+        }catch(Exception e){
+            throw e;
+        }
+      }
+      ```
+    - This endpoint will authenticate user credentials and return a **JWT token**.
+
+3. **JWT Utility Class (`JWTUtil`)**
+    - Handles token generation, extraction, and validation:
+      ```java
+      public String generateToken(String username);
+      public String extractUsername(String token);
+      public boolean validateToken(String token, UserDetails userDetails, String token);
+      ```
+
+4. **JWTAuthenticationFilter**
+    - A custom filter that:
+        - Intercepts incoming requests
+        - Extracts and validates JWT tokens
+        - Loads user details and sets authentication context if the token is valid
+
+---
 
 ### 🔐 SecurityConfig.java
 
@@ -99,16 +152,23 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        .requestMatchers("/authenticate", "/login").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .httpBasic(withDefaults());
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
 ```
+---
+### 🔁 JWT Authentication Flow (Postman)
+
+1. **Client** sends credentials via `POST /authenticate`.
+2. **Server** validates and returns a signed JWT token.
+3. **Client** stores the token and includes it in `Authorization: Bearer <token>` headers.
+4. **JWT Filter** checks the token on every request and authenticates the user if valid.
 ---
 ### 🧑‍💼 Admin User Initialization
 The AdminUserInitializer component adds a default admin user at application startup if no users exist in the database. This ensures you have at least one login credential when the app is launched for the first time.
