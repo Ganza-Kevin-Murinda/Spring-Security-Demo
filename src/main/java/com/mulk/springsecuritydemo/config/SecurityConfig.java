@@ -41,35 +41,11 @@ public class SecurityConfig{
     }
 
     @Bean
-    public AuthenticationManager authenticationManagerBean(PasswordEncoder passwordEncoder) throws Exception {
+    public AuthenticationManager authenticationManagerBean(PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(customUserDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(daoAuthenticationProvider);
     }
 
-
-
-
-
-
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-//        http
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/login", "/public/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin(form -> form
-//                        .loginPage("/login")
-//                        .defaultSuccessUrl("/dashboard", true)
-//                        .failureUrl("/login?error=true")
-//                        .permitAll()
-//                )
-//                .logout(logout -> logout.
-//                        logoutUrl("/logout")
-//                        .logoutSuccessUrl("/login?logout=true")
-//                        .permitAll()
-//                );
-//        return http.build();
-//    }
 }
